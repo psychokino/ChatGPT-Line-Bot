@@ -4,8 +4,17 @@
 
 [![license](https://img.shields.io/pypi/l/ansicolortags.svg)](LICENSE) [![Release](https://img.shields.io/github/v/release/TheExplainthis/ChatGPT-Line-Bot)](https://github.com/TheExplainthis/ChatGPT-Line-Bot/releases/)
 
+## 優化
+- OPENAI API KEY不再會存到REPO
+- 送出的對話紀錄現在開始會計算TOKEN，並自動剔除過多的對話紀錄(除非一筆紀錄就超過TOKEN)
+- API KEY 改成自己提供(寫到secret裡面)，不再要求使用者註冊
+- 新增懶人模式/多話模式，預設懶人模式，在此模式下需要被標記才會回答
+- 新增 GPT3.5/GPT4 的切換功能
+- 現在開始 CHATGPT 會視群組和單人用戶為不同的個體
+- 現在src.memory模組能更好的對不同群組/用戶客製化設定，但還沒有儲存的功能
+- 懶人模式下的語音輸入會變成語音轉文字功能
 
-## 更新
+## 原作者的更新
 - 2023/03/23 更新總結 Youtube 影片內容、新聞文章（支援：聯合報、Yahoo 新聞、三立新聞網、中央通訊社、風傳媒、TVBS、自由時報、ETtoday、中時新聞網、Line 新聞、台視新聞網）
 - 2023/03/18 新增 Whipser 服務、用戶可以新增自己的 Token、新增指令（參考文件下方）
 - 2023/03/03 模型換成 chat completion: `gpt-3.5-turbo`
