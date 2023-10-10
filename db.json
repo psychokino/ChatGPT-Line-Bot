@@ -1,1 +1,52 @@
-{"U3cbfef46cb6b39364be80fc2ec1fa9a2": "123", "Ueee4852cf34ab92ab439eaa711b68684": "123", "U2de8acafd2ec4ca40279ed23e374666c": "123", "U4983d521354b5eae113500a1a6edb66a": "123", "C53cba66a48e232a6b57fa9a90c9c103d": "123"}
+{
+    "U3cbfef46cb6b39364be80fc2ec1fa9a2": {
+        "group_users": [
+            "諺喝諺喝"
+        ],
+        "priviledge": 1,
+        "gpt_mode": "gpt-3.5-turbo",
+        "is_lazy": false
+    },
+    "Ueee4852cf34ab92ab439eaa711b68684": {
+        "priviledge": 1
+    },
+    "U2de8acafd2ec4ca40279ed23e374666c": {
+        "priviledge": 1
+    },
+    "U4983d521354b5eae113500a1a6edb66a": {
+        "priviledge": 1
+    },
+    "C53cba66a48e232a6b57fa9a90c9c103d": {
+        "alias": [
+            "群組測試"
+        ],
+        "priviledge": 1,
+        "gpt_mode": "gpt-3.5-turbo",
+        "is_lazy": false,
+        "group_users": [
+            "諺喝諺喝"
+        ]
+    },
+    "C80f307757723f1c17c0e96fc6f106a69": {
+        "group_users": [
+            "諺喝諺喝"
+        ],
+        "priviledge": 1,
+        "gpt_mode": "gpt-3.5-turbo",
+        "is_lazy": false
+    },
+    "Ca735a624e5bc89ad45e5dbd0000deaa2": {
+        "priviledge": 1,
+        "is_group": true,
+        "gpt_mode": "gpt-3.5-turbo",
+        "is_lazy": true,
+        "group_users": [
+            "黃明玉",
+            "諺喝諺喝",
+            "a group user"
+        ],
+        "alias": [
+            "團圓Lovely Ho’s Family"
+        ]
+    }
+}
