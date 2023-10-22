@@ -6,15 +6,21 @@ from linebot.models import (MessageEvent, TextMessage, TextSendMessage,
                             ImageSendMessage, AudioMessage)
 import os
 import uuid
+import json
 
 from src.models import OpenAIModel
 from src.memory import Memory
 from src.logger import logger
 from src.storage import Storage as db
-from src.utils import get_role_and_content
+from src.utils import get_role_and_content, ChatCompletion
 from src.service.youtube import Youtube, YoutubeTranscriptReader
 from src.service.website import Website, WebsiteReader
 from src.mongodb import mongodb
+from src.service.google_search import GoogleSearch
+from src.service.calculator import Calculator
+from collections import defaultdict
+
+import datetime
 
 load_dotenv('.env')
 
@@ -25,9 +31,11 @@ storage = None
 youtube = Youtube(step=4)
 website = Website()
 openai_api = str(os.getenv('OPENAI_API'))
+google_key = str(os.getenv('GOOGLE_API'))
+google_cse_id = str(os.getenv('GOOGLE_CSE_ID'))
+google = GoogleSearch(google_key, google_cse_id)
 
-memory = Memory(system_message=os.getenv('SYSTEM_MESSAGE'),
-                memory_message_count=10)
+memory = Memory(system_message=os.getenv('SYSTEM_MESSAGE'))
 
 model_management = {}
 api_keys = {}
@@ -115,6 +123,9 @@ def handle_text_message(event):
 
         gpt_mode = storage.read(user_id, 'gpt_mode')
         is_lazy = storage.read(user_id, 'is_lazy')
+        chat_history = storage.read(user_id, 'chat_history')
+        can_use_function = storage.read(user_id, 'function_call')
+
         storage.add(user_id, 'group_users', role_name)
         if is_group:
             storage.add(user_id, 'alias', group_name)
@@ -126,12 +137,14 @@ def handle_text_message(event):
                 return True
 
             storage.save(user_id, 'gpt_mode', 'gpt-4')
+            storage.save(user_id, 'chat_history', 2)
             msg = TextSendMessage(text="切換成功，我現在是 GPT-4")
             line_bot_api.reply_message(event.reply_token, msg)
             return True
 
         if text.startswith('/gpt3.5'):
             storage.save(user_id, 'gpt_mode', 'gpt-3.5-turbo')
+            storage.save(user_id, 'chat_history', 15)
             msg = TextSendMessage(text="切換成功，我現在是 GPT-3.5")
             line_bot_api.reply_message(event.reply_token, msg)
             return True
@@ -150,6 +163,13 @@ def handle_text_message(event):
         if text.startswith('/切換多話模式'):
             storage.save(user_id, 'is_lazy', False)
             msg = TextSendMessage(text="切換成功，你現在說什麼我都會回答你")
+            line_bot_api.reply_message(event.reply_token, msg)
+            return True
+
+        if text.startswith('/function_call'):
+            switch = text[15:].strip()
+            storage.save(user_id, 'function_call', switch == 'on')
+            msg = TextSendMessage(text="網路搜尋功能 {}".format(switch == 'on'))
             line_bot_api.reply_message(event.reply_token, msg)
             return True
 
@@ -197,19 +217,20 @@ def handle_text_message(event):
         if text.startswith('/圖像'):
             prompt = text[3:].strip()
             prompt = """
-為了更好的使用DALL-E模型
-下方第一個冒號以後的內容是給 DALL-E 產生圖片的 prompt
-假如內容是非英文的話幫我翻譯成英文:
+把非英文轉成英文:
 """ + prompt
             memory.append(user_id, role_name, prompt)
 
             user_model = model_management[user_id]
             is_successful, response, error_message = user_model.chat_completions(
-                memory.get(user_id), 'gpt-3.5-turbo')
+                memory.get(user_id, chat_history), 'gpt-4')
             if not is_successful:
                 raise Exception(error_message)
 
             role, response = get_role_and_content(response)
+            msg = TextSendMessage(text='產生圖片中...提詞: {}'.format(response))
+            line_bot_api.push_message(user_id, msg)
+
             is_successful, response, error_message = model_management[
                 user_id].image_generations(response)
 
@@ -270,17 +291,98 @@ def handle_text_message(event):
                 msg = TextSendMessage(text=response)
 
         else:
-            is_successful, response, error_message = user_model.chat_completions(
-                memory.get(user_id), gpt_mode, False)
-            if not is_successful:
-                raise Exception(error_message)
+            iteration = 1
+            while iteration < 10:
+                if iteration == 9:
+                    can_use_function = False
 
-            role, response = get_role_and_content(response)
-            if role == 'function':
-                pass
+                if iteration > 3:
+                    gpt_mode = 'gpt-3.5-turbo'
+                    chat_history = 999
 
-            msg = TextSendMessage(text=response)
-            memory.append(user_id, role, response)
+                is_successful, response, error_message = user_model.chat_completions(
+                    memory.get(user_id, chat_history), gpt_mode,
+                    can_use_function)
+                if not is_successful:
+                    raise Exception(error_message)
+
+                body = ChatCompletion(response)
+                if not body.is_function_call():
+                    memory.append(user_id, body.role(), body.content())
+                    msg = TextSendMessage(text=body.content())
+                    break
+
+                iteration = iteration + 1
+
+                name = body.function_name()
+                logger.info(f'calling function: {name}')
+                if name == 'perform_google_search':
+                    key1 = body.function_call_arg('key1')
+                    key2 = body.function_call_arg('key2')
+                    key3 = body.function_call_arg('key3')
+                    key4 = body.function_call_arg('key4')
+
+                    query = '{} {} {} {}'.format(key1, key2 or '', key3 or '',
+                                                 key4 or '')
+
+                    memory.append(
+                        user_id, 'system',
+                        '你呼叫了 perform_google_search 並且關鍵字是 {}'.format(query))
+
+                    result = google.abstract(google.search(query.strip()))
+
+                    conclude = '以下是搜尋結果，請自行決定是否持續呼叫 view_website function'
+                    '來解讀任何找到的URL:\n' + '\n\n'.join(result)
+
+                    memory.append(user_id, 'system', conclude)
+                    continue
+
+                if name == 'view_website':
+
+                    url = body.function_call_arg('url')
+                    keyword = body.function_call_arg('keyword')
+
+                    if keyword:
+                        memory.append(
+                            user_id, 'system',
+                            '你呼叫了 view_website 並且網址是 {} 關鍵字是 {}'.format(
+                                url, keyword))
+                    else:
+                        memory.append(user_id, 'system',
+                                      '你呼叫了 view_website 並且網址是 {}'.format(url))
+
+                    chunks = website.get_content_from_url(url)
+                    if len(chunks) == 0:
+                        memory.append(user_id, 'system',
+                                      '無法撈取 {} 網站的文字，請嘗試其他網址'.format(url))
+                        continue
+
+                    website_reader = WebsiteReader(user_model, 'gpt-3.5-turbo')
+                    is_successful, response, error_message = website_reader.summarize(
+                        chunks, keyword)
+                    if not is_successful:
+                        raise Exception(error_message)
+
+                    role, response = get_role_and_content(response)
+                    memory.append(user_id, 'system',
+                                  'view_website的結果:\n' + response)
+
+                if name == 'get_time':
+                    memory.append(user_id, 'system', '你呼叫了 get_time')
+                    now = datetime.datetime.now() + datetime.timedelta(
+                        hours=8)  # UTC+8
+                    chinese_time = now.strftime("現在時間 %Y年%m月%d日 %H點%M分%S秒")
+                    memory.append(user_id, 'system', chinese_time)
+
+                if name == Calculator.name():
+                    operator = body.function_call_arg('operator')
+                    operands = body.function_call_arg('value')
+                    memory.append(
+                        user_id, 'system',
+                        '你呼叫了 {} 的 {}，去運算 {}'.format(Calculator.name(),
+                                                     operator, operands))
+                    result = Calculator.decode(operator, operands)
+                    memory.append(user_id, 'system', '運算結果是{}'.format(result))
 
     #except ValueError:
     #    msg = TextSendMessage(text='python script value error, please debug')
@@ -310,6 +412,8 @@ def handle_audio_message(event):
         event)
     gpt_mode = storage.read(user_id, 'gpt_mode')
     is_lazy = storage.read(user_id, 'is_lazy')
+    chat_history = storage.read(user_id, 'chat_history')
+
     storage.add(user_id, 'group_users', role_name)
     if is_group:
         storage.add(user_id, 'alias', group_name)
@@ -338,7 +442,8 @@ def handle_audio_message(event):
                 raise Exception(error_message)
             memory.append(user_id, role_name, response['text'])
             is_successful, response, error_message = model_management[
-                user_id].chat_completions(memory.get(user_id), gpt_mode)
+                user_id].chat_completions(memory.get(user_id, chat_history),
+                                          gpt_mode)
             if not is_successful:
                 raise Exception(error_message)
             role, response = get_role_and_content(response)

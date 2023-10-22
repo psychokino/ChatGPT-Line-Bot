@@ -5,7 +5,9 @@
         ],
         "priviledge": 1,
         "gpt_mode": "gpt-3.5-turbo",
-        "is_lazy": false
+        "is_lazy": false,
+        "chat_history": 15,
+        "function_call": true
     },
     "Ueee4852cf34ab92ab439eaa711b68684": {
         "priviledge": 1
@@ -25,7 +27,9 @@
         "is_lazy": false,
         "group_users": [
             "諺喝諺喝"
-        ]
+        ],
+        "chat_history": 15,
+        "function_call": true
     },
     "C80f307757723f1c17c0e96fc6f106a69": {
         "group_users": [
@@ -47,6 +51,17 @@
         ],
         "alias": [
             "團圓Lovely Ho’s Family"
+        ],
+        "chat_history": 15,
+        "function_call": 1
+    },
+    "Ude7121270062fd693092507761da9e96": {
+        "is_group": false,
+        "priviledge": 1,
+        "gpt_mode": "gpt-4",
+        "is_lazy": false,
+        "group_users": [
+            "黃明玉"
         ]
     }
 }

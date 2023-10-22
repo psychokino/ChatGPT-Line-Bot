@@ -16,7 +16,9 @@ class Storage:
         'is_group': False,
         'group_users': [],
         'alias': '',
-        'role_play': ''
+        'role_play': '',
+        'chat_history': 15,
+        'function_call': 0
     }
 
     #class Column(Enum):
@@ -43,7 +45,7 @@ class Storage:
         if not os.path.exists(self.fine_name):
             f = open(self.fine_name, 'w', newline='')
             f.close()
-            
+
         with open(self.fine_name, newline='') as jsonfile:
             data = json.load(jsonfile)
 
@@ -74,13 +76,12 @@ class Storage:
 
         if item not in self.history[user_id]:
             self.history[user_id][item] = []
-        
+
         if data in self.history[user_id][item]:
             return True
 
         self.history[user_id][item].append(data)
         with open(self.fine_name, 'w', newline='') as f:
             json.dump(self.history, f, ensure_ascii=False, indent=4)
-
 
         return True

@@ -17,12 +17,11 @@ class MemoryInterface:
 
 class Memory(MemoryInterface):
 
-    def __init__(self, system_message, memory_message_count, max_tokens=4070):
+    def __init__(self, system_message, max_tokens=4070):
         self.storage = defaultdict(list)
         self.settings = defaultdict(dict)
         self.system_messages = defaultdict(str)
         self.default_system_message = system_message
-        self.memory_message_count = memory_message_count
         self.max_tokens = max_tokens
         #self.default_settings = {'is_lazy': True, 'gpt_mode': 'gpt-3.5-turbo'}
         self.default_settings = {}
@@ -36,11 +35,12 @@ class Memory(MemoryInterface):
         }]
 
     def _drop_message(self, user_id: str):
+        memory_message_count = 30
         if len(self.storage.get(
-                user_id)) >= (self.memory_message_count + 1) * 2 + 1:
+                user_id)) >= (memory_message_count + 1) * 2 + 1:
             self.storage[user_id] = [
                 self.storage[user_id][0]
-            ] + self.storage[user_id][-(self.memory_message_count * 2):]
+            ] + self.storage[user_id][-(memory_message_count * 2):]
 
         while self._get_token_length(user_id) > self.max_tokens:
             if len(self.storage[user_id]) > 2:
@@ -75,14 +75,23 @@ class Memory(MemoryInterface):
                 'role':
                 'user',
                 'content':
-                '{} said: {}'.format(role, content)
+                '{}: {}'.format(role, content)
             })
         else:
             self.storage[user_id].append({'role': role, 'content': content})
 
         self._drop_message(user_id)
 
-    def get(self, user_id: str) -> str:
+    # let user can further shrink chat history if use more expensive model
+    # _drop_message::memory_message_count defined max recorded chat history
+    def get(self, user_id: str, shrink_mesg_round=15):
+        expected_round = shrink_mesg_round * 2 + 1
+        if len(self.storage[user_id]) > expected_round:
+            return [
+                [self.storage[user_id][0]] +
+                self.storage[user_id][-shrink_mesg_round * 2:]
+            ]
+
         return self.storage[user_id]
 
     def remove(self, user_id: str) -> None:

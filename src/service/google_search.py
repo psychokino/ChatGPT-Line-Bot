@@ -1,12 +1,46 @@
 from googleapiclient.discovery import build
 
-def google_search(api_key, cse_id, query):
-    service = build("customsearch", "v1", developerKey=api_key)
-    results = service.cse().list(q=query, cx=cse_id).execute()
-    return results
 
-api_key = "您的API金鑰"
-cse_id = "您的自定義搜索引擎ID"
-query = "要搜索的詞語"
+class GoogleSearch:
 
-results = google_search(api_key, cse_id, query)
+    def __init__(self, api_key, cse_id):
+        self.service = build('customsearch',
+                             'v1',
+                             developerKey=api_key,
+                             static_discovery=False)
+        self.cse_id = cse_id
+
+    def search(self, keyword):
+        return self.service.cse().list(q=keyword, cx=self.cse_id).execute()
+
+    # keys : ['kind', 'url', 'queries', 'context', 'searchInformation', 'items']
+    # `items` is a list of dicts represent 10 search result:
+    # keys in each item: dict_keys(['kind', 'title', 'htmlTitle', 'link', 'displayLink',
+    # 'snippet', 'htmlSnippet', 'cacheId', 'formattedUrl', 'htmlFormattedUrl', 'pagemap'])
+    # 這個函數會把它濃縮成一個包含 'result01' ~ 'result10' 的dict 並且每個內涵 title, link, snippet
+    def json_abstract(self, result: dict):
+        condense = {}
+        items = result['items']
+        for index in range(len(items)):
+            dict_key = 'search_result_{}'.format(index)
+            condense[dict_key] = {
+                'title': items[index]['title'],
+                'link': items[index]['link'],
+                'snippet': items[index]['snippet']
+            }
+        return condense
+
+    def abstract(self, result: dict):
+        condense = []
+        items = result['items']
+        for index in range(len(items)):
+            content = '''search_result_{}
+            title: {}
+            link: {}
+            snippet: {}
+            '''.format(index, items[index]['title'], items[index]['link'],
+                       items[index]['snippet'])
+
+            condense.append(content)
+
+        return condense

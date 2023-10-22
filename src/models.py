@@ -1,5 +1,6 @@
 from typing import List, Dict
 import requests
+from src.service.calculator import Calculator
 
 
 class ModelInterface:
@@ -49,31 +50,34 @@ class OpenAIModel(ModelInterface):
     }, {
         "name": "view_website",
         "description":
-        "view website content for a given url, call this if you want to fetch content from a website",
+        "view content for a given url, call this if you found url link from google_search or user",
         "parameters": {
             "type": "object",
             "properties": {
                 "url": {
                     "type": "string",
                     "description": "website url for viewing content"
+                },
+                "keyword": {
+                    "type":
+                    "string",
+                    "description":
+                    "interested keyword you want to pay more addition to the website"
                 }
             },
             "required": ["key1"]
         }
     }, {
-        "name": "get_youtube_video_transcript",
-        "description":
-        "view transcript of a youtube video, call this if you want to know the video content of a youtube video",
+        "name": "get_time",
+        "description": "抓取系統目前的時間和日期，請務必使用這個功能獲取時間，不要擅自回答或決定現在的時間",
         "parameters": {
             "type": "object",
-            "properties": {
-                "url": {
-                    "type": "string",
-                    "description": "a youtube video url"
-                }
-            },
-            "required": ["key1"]
+            "properties": {}
         }
+    }, {
+        "name": Calculator.name(),
+        "description": Calculator.description(),
+        "parameters": Calculator.parameters()
     }]
 
     def __init__(self, api_key: str):
