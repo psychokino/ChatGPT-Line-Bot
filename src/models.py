@@ -99,7 +99,8 @@ class OpenAIModel(ModelInterface):
                                   files=files)
             r = r.json()
             if r.get('error'):
-                return False, None, r.get('error', {}).get('message')
+                return False, None, 'request error... {}'.format(
+                    r.get('error', {}).get('message'))
         except Exception:
             return False, None, 'OpenAI API 系統不穩定，請稍後再試'
 

@@ -11,7 +11,7 @@ class Storage:
 
     default_settings = {
         'priviledge': 1,
-        'gpt_mode': 'gpt-3.5-turbo',
+        'gpt_mode': 'gpt-3.5-turbo-1106',
         'is_lazy': True,
         'is_group': False,
         'group_users': [],
@@ -61,7 +61,7 @@ class Storage:
         if not item:
             return self.history[user_id].keys()
 
-        if not self.history[user_id]:
+        if user_id not in self.history:
             self.history[user_id] = {}
 
         if item not in self.history[user_id]:

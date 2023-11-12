@@ -54,7 +54,9 @@ class Calculator:
         elif operator == "summary":
             return Calculator.add(operands)
         else:
-            raise Exception("Invalid operator")
+            raise Exception(
+                "Invalid operator, operator {} and operands {}".format(
+                    operator, operands))
 
     @staticmethod
     def description():
@@ -69,7 +71,7 @@ class Calculator:
         content["properties"]["operator"] = {}
         content["properties"]["operator"]["type"] = "string"
         content["properties"]["operator"]["description"] = """
-            提供 'add' 'substract' 'multiply' 'divide' 'summary' 五種操作
+            提供 'add' 'subtract' 'multiply' 'divide' 'summary' 五種操作
             add相加，substract相減，multiply相乘，divide相除，summary加總所有數
             """
 
@@ -84,5 +86,5 @@ class Calculator:
             """
 
         content["required"] = ["operator", "value"]
-        
+
         return content

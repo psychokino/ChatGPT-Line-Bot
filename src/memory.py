@@ -70,6 +70,9 @@ class Memory(MemoryInterface):
         if self.storage[user_id] == []:
             self._initialize(user_id)
 
+        if "'" in content:
+            content = content.replace("'", "\\'")
+
         if role not in api_support:
             self.storage[user_id].append({
                 'role':
@@ -87,10 +90,8 @@ class Memory(MemoryInterface):
     def get(self, user_id: str, shrink_mesg_round=15):
         expected_round = shrink_mesg_round * 2 + 1
         if len(self.storage[user_id]) > expected_round:
-            return [
-                [self.storage[user_id][0]] +
-                self.storage[user_id][-shrink_mesg_round * 2:]
-            ]
+            return [[self.storage[user_id][0]] +
+                    self.storage[user_id][-shrink_mesg_round * 2:]]
 
         return self.storage[user_id]
 

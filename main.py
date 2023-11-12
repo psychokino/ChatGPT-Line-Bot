@@ -136,15 +136,15 @@ def handle_text_message(event):
                 line_bot_api.reply_message(event.reply_token, msg)
                 return True
 
-            storage.save(user_id, 'gpt_mode', 'gpt-4')
-            storage.save(user_id, 'chat_history', 2)
+            storage.save(user_id, 'gpt_mode', 'gpt-4-1106-preview')
+            storage.save(user_id, 'chat_history', 3)
             msg = TextSendMessage(text="切換成功，我現在是 GPT-4")
             line_bot_api.reply_message(event.reply_token, msg)
             return True
 
         if text.startswith('/gpt3.5'):
-            storage.save(user_id, 'gpt_mode', 'gpt-3.5-turbo')
-            storage.save(user_id, 'chat_history', 15)
+            storage.save(user_id, 'gpt_mode', 'gpt-3.5-turbo-1106')
+            storage.save(user_id, 'chat_history', 20)
             msg = TextSendMessage(text="切換成功，我現在是 GPT-3.5")
             line_bot_api.reply_message(event.reply_token, msg)
             return True

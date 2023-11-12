@@ -4,9 +4,9 @@
             "諺喝諺喝"
         ],
         "priviledge": 1,
-        "gpt_mode": "gpt-3.5-turbo",
+        "gpt_mode": "gpt-4-1106-preview",
         "is_lazy": false,
-        "chat_history": 15,
+        "chat_history": 3,
         "function_call": true
     },
     "Ueee4852cf34ab92ab439eaa711b68684": {
@@ -16,15 +16,22 @@
         "priviledge": 1
     },
     "U4983d521354b5eae113500a1a6edb66a": {
-        "priviledge": 1
+        "priviledge": 1,
+        "gpt_mode": "gpt-4-1106-preview",
+        "is_lazy": false,
+        "chat_history": 2,
+        "function_call": 0,
+        "group_users": [
+            "Sandy"
+        ]
     },
     "C53cba66a48e232a6b57fa9a90c9c103d": {
         "alias": [
             "群組測試"
         ],
         "priviledge": 1,
-        "gpt_mode": "gpt-3.5-turbo",
-        "is_lazy": false,
+        "gpt_mode": "gpt-3.5-turbo-1106",
+        "is_lazy": true,
         "group_users": [
             "諺喝諺喝"
         ],
@@ -33,21 +40,28 @@
     },
     "C80f307757723f1c17c0e96fc6f106a69": {
         "group_users": [
-            "諺喝諺喝"
+            "諺喝諺喝",
+            "a group user"
         ],
         "priviledge": 1,
-        "gpt_mode": "gpt-3.5-turbo",
-        "is_lazy": false
+        "gpt_mode": "gpt-4-1106-preview",
+        "is_lazy": false,
+        "chat_history": 4,
+        "function_call": 1,
+        "alias": [
+            "帳務鴨"
+        ]
     },
     "Ca735a624e5bc89ad45e5dbd0000deaa2": {
         "priviledge": 1,
         "is_group": true,
-        "gpt_mode": "gpt-3.5-turbo",
+        "gpt_mode": "gpt-3.5-turbo-1106",
         "is_lazy": true,
         "group_users": [
             "黃明玉",
             "諺喝諺喝",
-            "a group user"
+            "a group user",
+            "Sandy"
         ],
         "alias": [
             "團圓Lovely Ho’s Family"
@@ -58,10 +72,40 @@
     "Ude7121270062fd693092507761da9e96": {
         "is_group": false,
         "priviledge": 1,
-        "gpt_mode": "gpt-4",
+        "gpt_mode": "gpt-4-1106-preview",
         "is_lazy": false,
         "group_users": [
             "黃明玉"
+        ],
+        "chat_history": 4,
+        "function_call": 0
+    },
+    "U87107d8a02ccd1a36fdd70abaf45b6f7": {
+        "is_group": false,
+        "priviledge": 1,
+        "gpt_mode": "gpt-3.5-turbo-1106",
+        "is_lazy": false,
+        "chat_history": 2,
+        "function_call": 1,
+        "group_users": [
+            "媛楨"
+        ]
+    },
+    "Cf8ec643bfedf6dd4d1b4c987d74b3c99": {
+        "is_group": true,
+        "priviledge": 1,
+        "gpt_mode": "gpt-4-1106-preview",
+        "is_lazy": true,
+        "chat_history": 15,
+        "function_call": 0,
+        "group_users": [
+            "黃明玉",
+            "a group user",
+            "諺喝諺喝",
+            "Sandy"
+        ],
+        "alias": [
+            "queena是87"
         ]
     }
 }
