@@ -12,7 +12,7 @@ from src.models import OpenAIModel
 from src.memory import Memory
 from src.logger import logger
 from src.storage import Storage as db
-from src.utils import get_role_and_content, ChatCompletion
+from src.utils import get_role_and_content, Decoder
 from src.service.youtube import Youtube, YoutubeTranscriptReader
 from src.service.website import Website, WebsiteReader
 from src.mongodb import mongodb
@@ -20,6 +20,7 @@ from src.service.google_search import GoogleSearch
 from src.service.calculator import Calculator
 from collections import defaultdict
 
+import openai
 import datetime
 
 load_dotenv('.env')
@@ -237,7 +238,7 @@ def handle_text_message(event):
             if not is_successful:
                 raise Exception(error_message)
 
-            url = response['data'][0]['url']
+            url = response.data[0].url
             msg = ImageSendMessage(original_content_url=url,
                                    preview_image_url=url)
             memory.append(user_id, 'assistant', url)
@@ -306,7 +307,7 @@ def handle_text_message(event):
                 if not is_successful:
                     raise Exception(error_message)
 
-                body = ChatCompletion(response)
+                body = Decoder(response)
                 if not body.is_function_call():
                     memory.append(user_id, body.role(), body.content())
                     msg = TextSendMessage(text=body.content())
@@ -377,10 +378,10 @@ def handle_text_message(event):
                 if name == Calculator.name():
                     operator = body.function_call_arg('operator')
                     operands = body.function_call_arg('value')
-                    memory.append(
-                        user_id, 'system',
-                        '你呼叫了 {} 的 {}，去運算 {}'.format(Calculator.name(),
-                                                     operator, operands))
+                    str_val_list = str(operands).replace('[', '(').replace(']', ')')
+                    prompt = '你呼叫了 {} 的 {}，去運算 {}'.format(Calculator.name(), operator, str_val_list)
+                    
+                    memory.append(user_id, 'system', prompt)
                     result = Calculator.decode(operator, operands)
                     memory.append(user_id, 'system', '運算結果是{}'.format(result))
 
@@ -390,17 +391,24 @@ def handle_text_message(event):
     #except KeyError:
     #    msg = TextSendMessage(text='python script key error, please debug')
 
+    except openai.APIConnectionError as e:
+        print("The server could not be reached")
+        print(e.__cause__)  # an underlying Exception, likely raised within httpx.
+        msg = TextSendMessage(text="連線失敗，請再試一次")
+
+    except openai.RateLimitError as e:
+        print("A 429 status code was received; we should back off a bit.")
+        msg = TextSendMessage(text="訊息太密集了，請等一下再試試")
+
+    except openai.APIStatusError as e:
+        print("Another non-200-range status code was received")
+        print(e.status_code)
+        print(e.response)
+        msg = TextSendMessage(text="系統錯誤，請再試一次")
+
     except Exception as e:
         memory.remove(user_id)
-        if str(e).startswith('Incorrect API key provided'):
-            msg = TextSendMessage(text='OpenAI API Token 有誤，請重新註冊。')
-        elif str(e).startswith(
-                'That model is currently overloaded with other requests.'):
-            msg = TextSendMessage(text='已超過負荷，請稍後再試')
-        else:
-            msg = TextSendMessage(text=str(e))
-        line_bot_api.reply_message(event.reply_token, msg)
-        raise e
+        msg = TextSendMessage(text="程式錯誤，請再試一次")
 
     line_bot_api.reply_message(event.reply_token, msg)
 
@@ -433,14 +441,14 @@ def handle_audio_message(event):
                 user_id].audio_transcriptions(input_audio_path, 'whisper-1')
             if not is_successful:
                 raise Exception(error_message)
-            msg = TextSendMessage(text=response['text'])
+            msg = TextSendMessage(text=response.text)
 
         else:
             is_successful, response, error_message = model_management[
                 user_id].audio_transcriptions(input_audio_path, 'whisper-1')
             if not is_successful:
                 raise Exception(error_message)
-            memory.append(user_id, role_name, response['text'])
+            memory.append(user_id, role_name, response.text)
             is_successful, response, error_message = model_management[
                 user_id].chat_completions(memory.get(user_id, chat_history),
                                           gpt_mode)

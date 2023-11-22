@@ -4,9 +4,9 @@
             "諺喝諺喝"
         ],
         "priviledge": 1,
-        "gpt_mode": "gpt-4-1106-preview",
+        "gpt_mode": "gpt-3.5-turbo-1106",
         "is_lazy": false,
-        "chat_history": 3,
+        "chat_history": 20,
         "function_call": true
     },
     "Ueee4852cf34ab92ab439eaa711b68684": {
@@ -27,7 +27,8 @@
     },
     "C53cba66a48e232a6b57fa9a90c9c103d": {
         "alias": [
-            "群組測試"
+            "群組測試",
+            "GPT3被動版"
         ],
         "priviledge": 1,
         "gpt_mode": "gpt-3.5-turbo-1106",
@@ -44,9 +45,9 @@
             "a group user"
         ],
         "priviledge": 1,
-        "gpt_mode": "gpt-4-1106-preview",
+        "gpt_mode": "gpt-3.5-turbo-1106",
         "is_lazy": false,
-        "chat_history": 4,
+        "chat_history": 1,
         "function_call": 1,
         "alias": [
             "帳務鴨"
@@ -85,7 +86,7 @@
         "priviledge": 1,
         "gpt_mode": "gpt-3.5-turbo-1106",
         "is_lazy": false,
-        "chat_history": 2,
+        "chat_history": 4,
         "function_call": 1,
         "group_users": [
             "媛楨"
@@ -96,7 +97,7 @@
         "priviledge": 1,
         "gpt_mode": "gpt-4-1106-preview",
         "is_lazy": true,
-        "chat_history": 15,
+        "chat_history": 3,
         "function_call": 0,
         "group_users": [
             "黃明玉",

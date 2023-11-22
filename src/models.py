@@ -1,6 +1,8 @@
 from typing import List, Dict
 import requests
 from src.service.calculator import Calculator
+import json
+import openai
 
 
 class ModelInterface:
@@ -83,6 +85,7 @@ class OpenAIModel(ModelInterface):
     def __init__(self, api_key: str):
         self.api_key = api_key
         self.base_url = 'https://api.openai.com/v1'
+        self.client = openai.OpenAI(api_key=api_key)
 
     def _request(self, method, endpoint, body=None, files=None):
         self.headers = {'Authorization': f'Bearer {self.api_key}'}
@@ -93,13 +96,15 @@ class OpenAIModel(ModelInterface):
             elif method == 'POST':
                 if body:
                     self.headers['Content-Type'] = 'application/json'
+                    body = json.dumps(body)
                 r = requests.post(f'{self.base_url}{endpoint}',
                                   headers=self.headers,
-                                  json=body,
+                                  data=body,
                                   files=files)
             r = r.json()
             if r.get('error'):
-                return False, None, 'request error... {}'.format(
+                print(body)
+                return False, None, '伺服器請求錯誤... {}'.format(
                     r.get('error', {}).get('message'))
         except Exception:
             return False, None, 'OpenAI API 系統不穩定，請稍後再試'
@@ -113,19 +118,33 @@ class OpenAIModel(ModelInterface):
                          messages,
                          model_engine,
                          use_function=False) -> str:
-        json_body = {'model': model_engine, 'messages': messages}
-        if use_function:
-            json_body['functions'] = self.functions
 
-        return self._request('POST', '/chat/completions', body=json_body)
+        if use_function:
+            response = self.client.chat.completions.create(
+                model=model_engine,
+                messages=messages,
+                functions=self.functions)
+        else:
+            response = self.client.chat.completions.create(model=model_engine,
+                                                           messages=messages)
+
+        return True, response, None
 
     def audio_transcriptions(self, file_path, model_engine) -> str:
-        files = {
-            'file': open(file_path, 'rb'),
-            'model': (None, model_engine),
-        }
-        return self._request('POST', '/audio/transcriptions', files=files)
+        audio_file = open(file_path, 'rb')
+        transcript = self.client.audio.transcriptions.create(model="whisper-1",
+                                                             file=audio_file)
+
+        return True, transcript, None
 
     def image_generations(self, prompt: str) -> str:
         json_body = {"prompt": prompt, "n": 1, "size": "1024x1024"}
-        return self._request('POST', '/images/generations', body=json_body)
+
+        response = self.client.images.generate(
+          model="dall-e-3",
+          prompt=prompt,
+          size="1024x1024",
+          quality="standard",
+          n=1,
+        )
+        return True, response, None
