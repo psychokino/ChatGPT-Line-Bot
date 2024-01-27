@@ -10,8 +10,11 @@ class GoogleSearch:
                              static_discovery=False)
         self.cse_id = cse_id
 
-    def search(self, keyword):
-        return self.service.cse().list(q=keyword, cx=self.cse_id).execute()
+    def search(self, keyword, country='TW', language='zh-TW'):
+        return self.service.cse().list(q=keyword,
+                                       cx=self.cse_id,
+                                       cr='country' + country,
+                                       hl=language).execute()
 
     # keys : ['kind', 'url', 'queries', 'context', 'searchInformation', 'items']
     # `items` is a list of dicts represent 10 search result:
@@ -21,12 +24,12 @@ class GoogleSearch:
     def json_abstract(self, result: dict):
         condense = {}
         items = result['items']
-        for index in range(len(items)):
-            dict_key = 'search_result_{}'.format(index)
+        for i in range(len(items)):
+            dict_key = 'search_result_{}'.format(i)
             condense[dict_key] = {
-                'title': items[index]['title'],
-                'link': items[index]['link'],
-                'snippet': items[index]['snippet']
+                'title': items[i]['title'],
+                'url': items[i]['link'],
+                'snippet': items[i]['snippet']
             }
         return condense
 
@@ -34,10 +37,10 @@ class GoogleSearch:
         condense = []
         items = result['items']
         for index in range(len(items)):
-            content = '''search_result_{}
-            title: {}
-            link: {}
-            snippet: {}
+            content = '''搜尋結果{}
+            主旨: {}
+            url: {}
+            網址的內容摘要: {}
             '''.format(index, items[index]['title'], items[index]['link'],
                        items[index]['snippet'])
 

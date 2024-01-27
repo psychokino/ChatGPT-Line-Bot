@@ -25,16 +25,11 @@ class Decoder:
         return self.body.choices[0].message.function_call.name
 
     def function_call_arg(self, key):
-        try:
-            args = json.loads(self.body.choices[0].message
-                              .function_call.arguments)
-            if key not in args.keys():
-                return None
-
-            return args[key]
-
-        except:
+        args = json.loads(self.body.choices[0].message.function_call.arguments)
+        if key not in args.keys():
             return None
+
+        return args[key]
 
     def message(self):
         return self.body.choices[0].message

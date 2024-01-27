@@ -90,9 +90,9 @@ class Memory(MemoryInterface):
     def get(self, user_id: str, shrink_mesg_round=15):
         expected_round = shrink_mesg_round * 2 + 1
         if len(self.storage[user_id]) > expected_round:
-            return [[self.storage[user_id][0]] +
-                    self.storage[user_id][-shrink_mesg_round * 2:]]
-
+            mesg = [self.storage[user_id][0]]
+            mesg.extend(self.storage[user_id][-shrink_mesg_round*2:])
+            return mesg
         return self.storage[user_id]
 
     def remove(self, user_id: str) -> None:

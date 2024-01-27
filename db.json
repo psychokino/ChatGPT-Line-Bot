@@ -4,9 +4,9 @@
             "諺喝諺喝"
         ],
         "priviledge": 1,
-        "gpt_mode": "gpt-3.5-turbo-1106",
+        "gpt_mode": "gpt-4-1106-preview",
         "is_lazy": false,
-        "chat_history": 20,
+        "chat_history": 3,
         "function_call": true
     },
     "Ueee4852cf34ab92ab439eaa711b68684": {
@@ -47,7 +47,7 @@
         "priviledge": 1,
         "gpt_mode": "gpt-3.5-turbo-1106",
         "is_lazy": false,
-        "chat_history": 1,
+        "chat_history": 5,
         "function_call": 1,
         "alias": [
             "帳務鴨"
