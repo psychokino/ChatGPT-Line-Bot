@@ -119,6 +119,7 @@ class OpenAIModel(ModelInterface):
                          model_engine,
                          use_function=False) -> str:
 
+        #print(messages)
         if use_function:
             response = self.client.chat.completions.create(
                 model=model_engine,
@@ -130,10 +131,12 @@ class OpenAIModel(ModelInterface):
 
         return True, response, None
 
-    def audio_transcriptions(self, file_path, model_engine) -> str:
+    def audio_transcriptions(self, file_path, model_engine, user_note) -> str:
         audio_file = open(file_path, 'rb')
         transcript = self.client.audio.transcriptions.create(model="whisper-1",
-                                                             file=audio_file)
+                                                             file=audio_file,
+                                                             prompt=user_note)
+        audio_file.close()
 
         return True, transcript, None
 

@@ -1,7 +1,7 @@
 import os
 import logging
 import logging.handlers
-
+import sys
 
 class CustomFormatter(logging.Formatter):
     __LEVEL_COLORS = [
@@ -44,6 +44,13 @@ class LoggerFactory:
         logger = logging.getLogger('chatgpt_logger')
         logger.setLevel(logging.INFO)
         for handler in handlers:
+            if isinstance(handler, logging.StreamHandler) and handler.stream == sys.stdout:
+                # 確保控制台的 StreamHandler 使用 UTF-8 編碼
+                handler.stream = open(sys.stdout.fileno(), mode='w', encoding='utf-8', closefd=False)
+
+            if isinstance(handler, logging.FileHandler):  # 檢查這是否是文件處理器
+                handler.encoding = 'utf-8'  # 為 FileHandler 指定 UTF-8 編碼
+
             handler.setLevel(logging.DEBUG)
             handler.setFormatter(formatter)
             logger.addHandler(handler)

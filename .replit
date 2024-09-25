@@ -7,5 +7,9 @@ hidden = [".pythonlibs"]
 channel = "stable-23_05"
 
 [deployment]
-run = ["python3", "main.py"]
-deploymentTarget = "cloudrun"
+deploymentTarget = "static"
+publicDir = "demo"
+
+[[ports]]
+localPort = 8080
+externalPort = 80

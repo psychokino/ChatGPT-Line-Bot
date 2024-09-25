@@ -4,7 +4,7 @@
             "諺喝諺喝"
         ],
         "priviledge": 1,
-        "gpt_mode": "gpt-4-1106-preview",
+        "gpt_mode": "gpt-4-turbo",
         "is_lazy": false,
         "chat_history": 3,
         "function_call": true
@@ -17,7 +17,7 @@
     },
     "U4983d521354b5eae113500a1a6edb66a": {
         "priviledge": 1,
-        "gpt_mode": "gpt-4-1106-preview",
+        "gpt_mode": "gpt-4-turbo",
         "is_lazy": false,
         "chat_history": 2,
         "function_call": 0,
@@ -31,7 +31,7 @@
             "GPT3被動版"
         ],
         "priviledge": 1,
-        "gpt_mode": "gpt-3.5-turbo-1106",
+        "gpt_mode": "gpt-3.5-turbo",
         "is_lazy": true,
         "group_users": [
             "諺喝諺喝"
@@ -45,7 +45,7 @@
             "a group user"
         ],
         "priviledge": 1,
-        "gpt_mode": "gpt-3.5-turbo-1106",
+        "gpt_mode": "gpt-3.5-turbo",
         "is_lazy": false,
         "chat_history": 5,
         "function_call": 1,
@@ -56,7 +56,7 @@
     "Ca735a624e5bc89ad45e5dbd0000deaa2": {
         "priviledge": 1,
         "is_group": true,
-        "gpt_mode": "gpt-3.5-turbo-1106",
+        "gpt_mode": "gpt-3.5-turbo",
         "is_lazy": true,
         "group_users": [
             "黃明玉",
@@ -73,7 +73,7 @@
     "Ude7121270062fd693092507761da9e96": {
         "is_group": false,
         "priviledge": 1,
-        "gpt_mode": "gpt-4-1106-preview",
+        "gpt_mode": "gpt-4-turbo",
         "is_lazy": false,
         "group_users": [
             "黃明玉"
@@ -84,7 +84,7 @@
     "U87107d8a02ccd1a36fdd70abaf45b6f7": {
         "is_group": false,
         "priviledge": 1,
-        "gpt_mode": "gpt-3.5-turbo-1106",
+        "gpt_mode": "gpt-3.5-turbo",
         "is_lazy": false,
         "chat_history": 4,
         "function_call": 1,
@@ -95,7 +95,7 @@
     "Cf8ec643bfedf6dd4d1b4c987d74b3c99": {
         "is_group": true,
         "priviledge": 1,
-        "gpt_mode": "gpt-4-1106-preview",
+        "gpt_mode": "gpt-4-turbo",
         "is_lazy": true,
         "chat_history": 3,
         "function_call": 0,
